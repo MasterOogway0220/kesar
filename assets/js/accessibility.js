@@ -574,93 +574,13 @@
         } catch (e) { /* silent */ }
     }
 
-    function createWidgetHTML() {
-        // Floating trigger button
-        var trigger = document.createElement('button');
-        trigger.className = 'a11y-widget-trigger';
-        trigger.setAttribute('aria-label', 'Open accessibility settings');
-        trigger.setAttribute('title', 'Accessibility Settings');
-        trigger.innerHTML = '<svg class="a11y-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm-1 6h2c2.21 0 4 .45 4 1v1h-3v10h-1v-5h-2v5H10V10H7V9c0-.55 1.79-1 4-1z"/></svg>';
-        document.body.appendChild(trigger);
-
-        // Overlay
-        var overlay = document.createElement('div');
-        overlay.className = 'a11y-widget-overlay';
-        overlay.id = 'a11y-overlay';
-        document.body.appendChild(overlay);
-
-        // Panel
-        var panel = document.createElement('div');
-        panel.className = 'a11y-widget-panel';
-        panel.id = 'a11y-panel';
-        panel.setAttribute('role', 'dialog');
-        panel.setAttribute('aria-label', 'Accessibility Settings');
-        panel.setAttribute('aria-modal', 'true');
-        panel.innerHTML =
-            '<div class="a11y-panel-header">' +
-                '<h2><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm-1 6h2c2.21 0 4 .45 4 1v1h-3v10h-1v-5h-2v5H10V10H7V9c0-.55 1.79-1 4-1z"/></svg> Accessibility</h2>' +
-                '<button class="a11y-panel-close" aria-label="Close accessibility settings">&times;</button>' +
-            '</div>' +
-            '<div class="a11y-panel-body">' +
-
-                '<!-- Vision Section -->' +
-                '<div class="a11y-section">' +
-                    '<div class="a11y-section-title">Vision</div>' +
-                    '<div class="a11y-font-control">' +
-                        '<label>Font Size</label>' +
-                        '<div class="a11y-font-btns">' +
-                            '<button class="a11y-font-btn" data-size="1" aria-label="Default font size">A</button>' +
-                            '<button class="a11y-font-btn" data-size="2" aria-label="Large font size" style="font-size:1rem">A</button>' +
-                            '<button class="a11y-font-btn" data-size="3" aria-label="Larger font size" style="font-size:1.15rem">A</button>' +
-                            '<button class="a11y-font-btn" data-size="4" aria-label="Largest font size" style="font-size:1.3rem">A</button>' +
-                        '</div>' +
-                    '</div>' +
-                    '<div class="a11y-options-grid" style="margin-top:10px">' +
-                        '<button class="a11y-option-btn" data-feature="high-contrast"><span class="a11y-opt-icon" aria-hidden="true">&#9681;</span><span>High Contrast</span></button>' +
-                        '<button class="a11y-option-btn" data-feature="invert"><span class="a11y-opt-icon" aria-hidden="true">&#9789;</span><span>Invert Colors</span></button>' +
-                        '<button class="a11y-option-btn" data-feature="grayscale"><span class="a11y-opt-icon" aria-hidden="true">&#9898;</span><span>Grayscale</span></button>' +
-                        '<button class="a11y-option-btn" data-feature="low-saturation"><span class="a11y-opt-icon" aria-hidden="true">&#127752;</span><span>Low Saturation</span></button>' +
-                        '<button class="a11y-option-btn" data-feature="hide-images"><span class="a11y-opt-icon" aria-hidden="true">&#128247;</span><span>Hide Images</span></button>' +
-                        '<button class="a11y-option-btn" data-feature="dyslexia-font"><span class="a11y-opt-icon" aria-hidden="true">Aa</span><span>Dyslexia Font</span></button>' +
-                    '</div>' +
-                '</div>' +
-
-                '<!-- Navigation Section -->' +
-                '<div class="a11y-section">' +
-                    '<div class="a11y-section-title">Navigation & Reading</div>' +
-                    '<div class="a11y-options-grid">' +
-                        '<button class="a11y-option-btn" data-feature="highlight-links"><span class="a11y-opt-icon" aria-hidden="true">&#128279;</span><span>Highlight Links</span></button>' +
-                        '<button class="a11y-option-btn" data-feature="big-cursor"><span class="a11y-opt-icon" aria-hidden="true">&#128433;</span><span>Big Cursor</span></button>' +
-                        '<button class="a11y-option-btn" data-feature="reading-guide"><span class="a11y-opt-icon" aria-hidden="true">&#128214;</span><span>Reading Guide</span></button>' +
-                        '<button class="a11y-option-btn" data-feature="text-spacing"><span class="a11y-opt-icon" aria-hidden="true">&#8596;</span><span>Text Spacing</span></button>' +
-                        '<button class="a11y-option-btn" data-feature="stop-animations"><span class="a11y-opt-icon" aria-hidden="true">&#9209;</span><span>Stop Animations</span></button>' +
-                    '</div>' +
-                '</div>' +
-
-                '<!-- Reset -->' +
-                '<div class="a11y-section">' +
-                    '<button class="a11y-reset-btn">Reset All Settings</button>' +
-                '</div>' +
-
-            '</div>';
-
-        document.body.appendChild(panel);
-
-        // Reading guide element
-        var guide = document.createElement('div');
-        guide.className = 'a11y-reading-guide';
-        guide.id = 'a11y-reading-guide';
-        document.body.appendChild(guide);
-
-        return { trigger: trigger, overlay: overlay, panel: panel, guide: guide };
-    }
-
     function initWidget() {
-        var els = createWidgetHTML();
-        var panel = els.panel;
-        var overlay = els.overlay;
-        var trigger = els.trigger;
-        var guide = els.guide;
+        var trigger = document.querySelector('.a11y-widget-trigger');
+        var overlay = document.getElementById('a11y-overlay');
+        var panel = document.getElementById('a11y-panel');
+        var guide = document.getElementById('a11y-reading-guide');
+
+        if (!trigger || !panel) return;
 
         // Filter features (only one filter active at a time)
         var filterFeatures = ['high-contrast', 'invert', 'grayscale', 'low-saturation'];
