@@ -94,12 +94,37 @@
                     <button class="a11y-option-btn" data-feature="stop-animations"><span class="a11y-opt-icon" aria-hidden="true">&#9209;</span><span>Stop Animations</span></button>
                 </div>
             </div>
+            <div class="a11y-section a11y-tts-section">
+                <div class="a11y-section-title">Text to Speech</div>
+                <button class="a11y-tts-start-btn" id="a11y-tts-start">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                    Read Page Aloud
+                </button>
+                <div class="a11y-tts-speed">
+                    <label for="a11y-tts-speed">Speed:</label>
+                    <select id="a11y-tts-speed">
+                        <option value="0.5">0.5x Slow</option>
+                        <option value="0.75">0.75x</option>
+                        <option value="1" selected>1x Normal</option>
+                        <option value="1.25">1.25x</option>
+                        <option value="1.5">1.5x Fast</option>
+                        <option value="2">2x Very Fast</option>
+                    </select>
+                </div>
+            </div>
             <div class="a11y-section">
                 <button class="a11y-reset-btn">Reset All Settings</button>
             </div>
         </div>
     </div>
     <div class="a11y-reading-guide" id="a11y-reading-guide"></div>
+    <div class="a11y-tts-player" id="a11y-tts-player" role="region" aria-label="Text to speech player">
+        <button class="a11y-tts-player-btn" id="a11y-tts-rewind" aria-label="Previous section">&#9664;&#9664;</button>
+        <button class="a11y-tts-player-btn" id="a11y-tts-play" aria-label="Play">&#9654;</button>
+        <button class="a11y-tts-player-btn" id="a11y-tts-forward" aria-label="Next section">&#9654;&#9654;</button>
+        <span class="a11y-tts-player-text" id="a11y-tts-current" aria-live="polite"></span>
+        <button class="a11y-tts-player-close" id="a11y-tts-close" aria-label="Stop and close reader">&times;</button>
+    </div>
     <!-- /Accessibility Widget -->
 
 

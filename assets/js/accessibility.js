@@ -767,6 +767,202 @@
         loadPrefs();
     }
 
+    // ===== 17. TEXT-TO-SPEECH =====
+    function initTTS() {
+        var synth = window.speechSynthesis;
+        if (!synth) return; // Browser doesn't support Speech API
+
+        var player = document.getElementById('a11y-tts-player');
+        var startBtn = document.getElementById('a11y-tts-start');
+        var speedSelect = document.getElementById('a11y-tts-speed');
+        if (!player || !startBtn) return;
+
+        var playPauseBtn = document.getElementById('a11y-tts-play');
+        var rewindBtn = document.getElementById('a11y-tts-rewind');
+        var forwardBtn = document.getElementById('a11y-tts-forward');
+        var closeBtn = document.getElementById('a11y-tts-close');
+        var playerText = document.getElementById('a11y-tts-current');
+
+        var sentences = [];
+        var currentIndex = 0;
+        var isPaused = false;
+        var isPlaying = false;
+        var currentHighlight = null;
+
+        // Gather readable text from the page
+        function gatherText() {
+            var selectors = [
+                'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+                'p', 'li', 'td', 'th', 'figcaption',
+                'blockquote', '.card__title', '.card--small-title',
+                'label', 'a.nav-link'
+            ];
+            var elements = [];
+            var seen = new Set();
+
+            selectors.forEach(function (sel) {
+                var nodes = document.querySelectorAll(sel);
+                nodes.forEach(function (node) {
+                    // Skip hidden elements, widget panel, preloader
+                    if (node.closest('.a11y-widget-panel') || node.closest('.a11y-tts-player') ||
+                        node.closest('.preloader') || node.closest('.a11y-widget-overlay')) return;
+                    if (node.offsetParent === null && window.getComputedStyle(node).position !== 'fixed') return;
+
+                    var text = node.textContent.trim();
+                    if (text.length < 2 || seen.has(text)) return;
+                    seen.add(text);
+                    elements.push({ el: node, text: text });
+                });
+            });
+
+            return elements;
+        }
+
+        function highlightElement(el) {
+            clearHighlight();
+            if (el) {
+                el.classList.add('a11y-tts-highlight');
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                currentHighlight = el;
+            }
+        }
+
+        function clearHighlight() {
+            if (currentHighlight) {
+                currentHighlight.classList.remove('a11y-tts-highlight');
+                currentHighlight = null;
+            }
+        }
+
+        function speakCurrent() {
+            if (currentIndex >= sentences.length) {
+                stopTTS();
+                return;
+            }
+
+            synth.cancel();
+            var item = sentences[currentIndex];
+            var utterance = new SpeechSynthesisUtterance(item.text);
+            utterance.rate = parseFloat(speedSelect ? speedSelect.value : 1);
+            utterance.lang = 'en-IN';
+
+            highlightElement(item.el);
+            if (playerText) playerText.textContent = item.text;
+
+            utterance.onend = function () {
+                if (!isPaused && isPlaying) {
+                    currentIndex++;
+                    speakCurrent();
+                }
+            };
+
+            utterance.onerror = function () {
+                if (isPlaying && !isPaused) {
+                    currentIndex++;
+                    speakCurrent();
+                }
+            };
+
+            synth.speak(utterance);
+            isPlaying = true;
+            isPaused = false;
+            playPauseBtn.innerHTML = '&#9646;&#9646;';
+            playPauseBtn.setAttribute('aria-label', 'Pause reading');
+            playPauseBtn.classList.add('playing');
+        }
+
+        function stopTTS() {
+            synth.cancel();
+            isPlaying = false;
+            isPaused = false;
+            currentIndex = 0;
+            clearHighlight();
+            player.classList.remove('active');
+            if (playerText) playerText.textContent = '';
+            playPauseBtn.innerHTML = '&#9654;';
+            playPauseBtn.setAttribute('aria-label', 'Play');
+            playPauseBtn.classList.remove('playing');
+            window.a11yAnnounce('Text to speech stopped');
+        }
+
+        // Start button in widget panel
+        startBtn.addEventListener('click', function () {
+            sentences = gatherText();
+            if (sentences.length === 0) {
+                window.a11yAnnounce('No readable content found on this page');
+                return;
+            }
+            currentIndex = 0;
+            player.classList.add('active');
+            // Close the widget panel
+            var panelEl = document.getElementById('a11y-panel');
+            var overlayEl = document.getElementById('a11y-overlay');
+            if (panelEl) panelEl.classList.remove('open');
+            if (overlayEl) overlayEl.classList.remove('open');
+            document.body.style.overflow = '';
+            var triggerBtn = document.querySelector('.a11y-widget-trigger');
+            if (triggerBtn) triggerBtn.setAttribute('aria-expanded', 'false');
+
+            window.a11yAnnounce('Reading page content aloud. ' + sentences.length + ' items found.');
+            speakCurrent();
+        });
+
+        // Play / Pause
+        playPauseBtn.addEventListener('click', function () {
+            if (!isPlaying && !isPaused) {
+                // Start from beginning
+                speakCurrent();
+            } else if (isPaused) {
+                synth.resume();
+                isPaused = false;
+                isPlaying = true;
+                playPauseBtn.innerHTML = '&#9646;&#9646;';
+                playPauseBtn.setAttribute('aria-label', 'Pause reading');
+                playPauseBtn.classList.add('playing');
+            } else {
+                synth.pause();
+                isPaused = true;
+                isPlaying = false;
+                playPauseBtn.innerHTML = '&#9654;';
+                playPauseBtn.setAttribute('aria-label', 'Resume reading');
+                playPauseBtn.classList.remove('playing');
+            }
+        });
+
+        // Rewind (previous sentence)
+        rewindBtn.addEventListener('click', function () {
+            if (currentIndex > 0) {
+                currentIndex--;
+                speakCurrent();
+            }
+        });
+
+        // Forward (next sentence)
+        forwardBtn.addEventListener('click', function () {
+            if (currentIndex < sentences.length - 1) {
+                currentIndex++;
+                speakCurrent();
+            }
+        });
+
+        // Speed change while playing
+        if (speedSelect) {
+            speedSelect.addEventListener('change', function () {
+                if (isPlaying) {
+                    speakCurrent(); // Restart current with new speed
+                }
+            });
+        }
+
+        // Close
+        closeBtn.addEventListener('click', stopTTS);
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function () {
+            synth.cancel();
+        });
+    }
+
     // ===== INITIALIZE ALL =====
     function init() {
         initSkipLink();
@@ -784,6 +980,7 @@
         enhanceExternalLinks();
         enhanceTables();
         initWidget();
+        initTTS();
 
         // Delay slider enhancement to wait for slick init
         setTimeout(enhanceSliders, 2000);

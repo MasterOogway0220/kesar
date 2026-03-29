@@ -574,7 +574,173 @@ body.a11y-high-saturation {
 body.a11y-high-contrast.a11y-grayscale { filter: contrast(1.5) grayscale(1); }
 body.a11y-high-contrast.a11y-low-saturation { filter: contrast(1.5) saturate(0.5); }
 
-/* ===== 27. Panel responsive ===== */
+/* ===== 27. Text-to-Speech Player ===== */
+.a11y-tts-section {
+    background: #eef2ff;
+    border: 2px solid #c7d2fe;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.a11y-tts-section .a11y-section-title {
+    border-bottom-color: #c7d2fe;
+}
+
+.a11y-tts-start-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 14px 20px;
+    background: #2660B5;
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.a11y-tts-start-btn:hover {
+    background: #1a4a8a;
+}
+
+.a11y-tts-start-btn svg {
+    width: 22px;
+    height: 22px;
+    fill: currentColor;
+}
+
+.a11y-tts-speed {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 12px;
+    gap: 8px;
+}
+
+.a11y-tts-speed label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #374151;
+    white-space: nowrap;
+}
+
+.a11y-tts-speed select {
+    padding: 6px 10px;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    background: #ffffff;
+    color: #374151;
+    cursor: pointer;
+}
+
+/* Floating TTS Player Bar */
+.a11y-tts-player {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #1e293b;
+    color: #ffffff;
+    z-index: 10003;
+    padding: 12px 20px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.a11y-tts-player.active {
+    display: flex;
+}
+
+.a11y-tts-player-btn {
+    background: none;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.a11y-tts-player-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.a11y-tts-player-btn.playing {
+    background: #2660B5;
+    border-color: #2660B5;
+}
+
+.a11y-tts-player-text {
+    flex: 1;
+    max-width: 500px;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: #94a3b8;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.a11y-tts-player-close {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #94a3b8;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    transition: background 0.2s, color 0.2s;
+}
+
+.a11y-tts-player-close:hover {
+    background: #dc2626;
+    color: #ffffff;
+}
+
+/* TTS highlight on current text being read */
+.a11y-tts-highlight {
+    background: #fef08a !important;
+    color: #000000 !important;
+    box-shadow: 0 0 0 3px #fef08a;
+    border-radius: 3px;
+    transition: background 0.15s;
+}
+
+@media (max-width: 600px) {
+    .a11y-tts-player {
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 10px 14px;
+    }
+    .a11y-tts-player-text {
+        order: 3;
+        max-width: 100%;
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* ===== 28. Panel responsive ===== */
 @media (max-width: 480px) {
     .a11y-widget-panel {
         width: 100vw;
