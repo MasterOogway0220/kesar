@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- required meta -->
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- #favicon -->
+    <link rel="shortcut icon" href="assets/kesarnew.png" type="image/x-icon">
+    <!-- #title -->
+    <title>News - Kesar Securities | Latest Stock Market Updates</title>
+
+    <!--  css dependencies start  -->
+
+    <!-- bootstrap five css -->
+    <link rel="stylesheet" href="assets/vendor/bootstrap/css/bootstrap.min.css">
+    <!-- bootstrap-icons css -->
+    <link rel="stylesheet" href="./assets/css/bootstrap-icons.css">
+    <!-- nice select css -->
+    <link rel="stylesheet" href="assets/vendor/nice-select/css/nice-select.css">
+    <!-- magnific popup css -->
+    <link rel="stylesheet" href="assets/vendor/magnific-popup/css/magnific-popup.css">
+    <!-- slick css -->
+    <link rel="stylesheet" href="assets/vendor/slick/css/slick.css">
+    <!-- odometer css -->
+    <link rel="stylesheet" href="assets/vendor/odometer/css/odometer.css">
+    <!-- animate css -->
+    <link rel="stylesheet" href="assets/vendor/animate/animate.css">
+    <!--  / css dependencies end  -->
+
+    <!-- main css -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/accessibility.css">
+</head>
+<style>
+
+
+    /* Tabs Section */
+    .tabs-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 40px;
+        animation: fadeInUp 0.8s ease-out 0.2s both;
+    }
+
+    .tab-button {
+        padding: 12px 28px;
+        border: 2px solid transparent;
+        background: white;
+        color: #495057;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .tab-button::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 20px;
+        background: #2660B5;
+        transform: translate(-50%, -50%);
+        transition: width 0.4s, height 0.4s;
+        z-index: 0;
+    }
+
+    .tab-button span {
+        position: relative;
+        z-index: 1;
+    }
+
+    .tab-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+        border-color: #2660B5;
+    }
+
+    .tab-button.active {
+        background: #2660B5;
+        color: white;
+        border-color: transparent;
+        box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+    }
+
+    /* Search Section */
+    .search-container {
+        max-width: 700px;
+        margin: 0 auto 50px;
+        animation: fadeInUp 0.8s ease-out 0.4s both;
+    }
+
+    .search-wrapper {
+        position: relative;
+        display: flex;
+        gap: 15px;
+    }
+
+    .news-input {
+        flex: 1;
+        padding: 16px 24px;
+        border: 2px solid #e9ecef;
+        border-radius: 50px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: white;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .news-input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.2);
+    }
+
+    .search-button {
+        padding: 16px 32px;
+        background: #2660B5;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        white-space: nowrap;
+    }
+
+    .search-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4);
+        color: #f3f3f3;
+    }
+
+    /* Loading & Error States */
+    .loading, .error {
+        text-align: center;
+        padding: 40px;
+        margin: 30px 0;
+        border-radius: 15px;
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    .loading {
+        background: white;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .spinner {
+        width: 50px;
+        height: 50px;
+        margin: 0 auto 20px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .error {
+        background: #fff5f5;
+        color: #c53030;
+        border-left: 4px solid #c53030;
+    }
+
+    /* News Cards */
+    .cards-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 30px;
+        margin-top: 40px;
+    }
+
+    .news-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        opacity: 0;
+        animation: fadeInUp 0.6s ease-out forwards;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .news-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 12px 40px rgba(102, 126, 234, 0.25);
+    }
+
+    .news-card-header {
+        position: relative;
+        height: 220px;
+        overflow: hidden;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .news-card-header img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .news-card:hover .news-card-header img {
+        transform: scale(1.1);
+    }
+
+    .news-card-header::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 100px;
+        background: linear-gradient(to top, rgba(0,0,0,0.3), transparent);
+    }
+
+    .news-card-content {
+        padding: 25px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .news-source {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #667eea;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .news-source i {
+        font-size: 1rem;
+    }
+
+    .news-date {
+        color: #6c757d;
+        font-size: 0.85rem;
+        margin-top: 5px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .news-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin-bottom: 15px;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .news-desc {
+        color: #6c757d;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 20px;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        flex: 1;
+    }
+
+    .read-more {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #667eea;
+        font-weight: 600;
+        font-size: 0.95rem;
+        margin-top: auto;
+        transition: all 0.3s ease;
+    }
+
+    .news-card:hover .read-more {
+        gap: 12px;
+        color: #764ba2;
+    }
+
+    .read-more i {
+        transition: transform 0.3s ease;
+    }
+
+    .news-card:hover .read-more i {
+        transform: translateX(5px);
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Stagger animation for cards */
+    .news-card:nth-child(1) { animation-delay: 0.1s; }
+    .news-card:nth-child(2) { animation-delay: 0.2s; }
+    .news-card:nth-child(3) { animation-delay: 0.3s; }
+    .news-card:nth-child(4) { animation-delay: 0.4s; }
+    .news-card:nth-child(5) { animation-delay: 0.5s; }
+    .news-card:nth-child(6) { animation-delay: 0.6s; }
+    .news-card:nth-child(n+7) { animation-delay: 0.7s; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .section-header h1 {
+            font-size: 2rem;
+        }
+
+        .cards-container {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .tabs-container {
+            gap: 10px;
+        }
+
+        .tab-button {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+        }
+
+        .search-wrapper {
+            flex-direction: column;
+        }
+
+        .search-button {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .news-section {
+            padding: 40px 0;
+        }
+
+        .section-header {
+            margin-bottom: 30px;
+        }
+    }
+</style>
+<body>
+    <a href="#main-content" class="skip-to-main">Skip to main content</a>
+
+    <!--  Preloader  -->
+    <div class="preloader">
+        <span class="loader"></span>
+    </div>
+
+    <!--header-section start-->
+    <header class="header-section header-version3 header-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 p-0">
+                    <nav class="navbar navbar-expand-xl nav-shadow" id="#navbar">
+                        <a class="navbar-brand" href="index.html"><img width="200px" src="assets/kesar.png" class="logo" alt="logo"></a>
+                        <a class="navbar-toggler" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+                            <i class="bi bi-list"></i>
+                        </a>
+                        <div class="collapse navbar-collapse ms-auto " id="navbar-content">
+                            <div class="main-menu index-page">
+                                <ul class="navbar-nav mb-lg-0 me-auto">
+                                    <li class="nav-item dropdown nav-cus-item">
+                                        <a class="nav-link dropdown-toggle" href="index.html" role="button" aria-expanded="false"> Home </a>
+                                    </li> 
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="about.html" role="button" aria-expanded="false">About</a>
+                                    </li> 
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="news.html" role="button" aria-expanded="false" aria-current="page">News</a>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="stock_talk.html" role="button" aria-expanded="false">Stock Talk</a>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="investment_services.html" role="button" aria-expanded="false">Investment Services</a>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="forms.html" role="button" aria-expanded="false">Forms</a>
+                                    </li>
+                                </ul>
+                                <div class="nav-right d-none d-xl-block">
+                                    <div class="nav-right__search">
+                                        <a href="contact.html" class="btn_theme btn_theme_active">Contact Us <i class="bi bi-arrow-up-right"></i><span></span></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Offcanvas More info-->
+    <div class="offcanvas offcanvas-end " tabindex="-1" id="offcanvasRight">
+        <div class="offcanvas-body custom-nevbar">
+            <div class="row">
+                <div class="col-md-7 col-xl-8">
+                    <div class="custom-nevbar__left">
+                        <button type="button" class="close-icon d-md-none ms-auto" data-bs-dismiss="offcanvas" aria-label="Close"><i class="bi bi-x"></i></button>
+                        <ul class="custom-nevbar__nav mb-lg-0">
+                            <li class="nav-item dropdown nav-cus-item">
+                                <a class="nav-link dropdown-toggle" href="index.html" role="button" aria-expanded="false"> Home </a>
+                            </li> 
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="about.html" role="button" aria-expanded="false">About</a>
+                            </li> 
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="news.html" role="button" aria-expanded="false" aria-current="page">News</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="stock_talk.html" role="button" aria-expanded="false">Stock Talk</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="investment_services.html" role="button" aria-expanded="false">Investment Services</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="forms.html" role="button" aria-expanded="false">Forms</a>
+                            </li> 
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-5 col-xl-4">
+                    <div class="custom-nevbar__right">
+                        <div class="custom-nevbar__top d-none d-md-block">
+                            <button type="button" class="close-icon ms-auto" data-bs-dismiss="offcanvas" aria-label="Close"><i class="bi bi-x"></i></button>
+                            <div class="custom-nevbar__right-thumb mb-auto">
+                                <img src="assets/kesar.png" alt="logo">
+                            </div>
+                        </div>
+                        <ul class="custom-nevbar__right-location">
+                            <li>
+                                <p class="mb-2">Phone: </p>
+                                <a href="tel:9819153214" class="fs-4 contact">9819153214</a>
+                            </li>
+                            <li class="location">
+                                <p class="mb-2">Email: </p>
+                                <a href="mailto:Support@kesarsecurities.com" class="fs-4 contact">Support@kesarsecurities.com</a>
+                            </li>
+                            <li class="location">
+                                <p class="mb-2">Location: </p>
+                                <p class="fs-4 contact">701, Swami Krupa, D. L. Vaidya Road,
+                                    Near Akkalkot Swami Maharaj Math,
+                                    Dadar, Mumbai – 400028.</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- header-section end -->
+    
+    <!-- Banner Start -->
+    <section class="breadcrumb-bannner bg-fixed style1" id="main-content" role="main" data-background="assets/images/hero/breadcrumb-banner1.png">
+        <div class="container ">
+            <div class="banner__content">
+                <h1 class="banner__title mb-3 display-4 text-white wow fadeInLeft" data-wow-duration="0.8s">News</h1>                 
+            </div>
+        </div>
+    </section>
+    <!-- Banner End -->
+
+    <!-- News Section -->
+    <section class="section">
+        <div class="container">
+
+            <div class="tabs-container" role="tablist" aria-label="News categories">
+                <button class="tab-button active" role="tab" onclick="onTabClick('sensex', this)">
+                    <span>📊 Sensex</span>
+                </button>
+                <button class="tab-button" role="tab" onclick="onTabClick('nifty', this)">
+                    <span>📈 Nifty</span>
+                </button>
+                <button class="tab-button" role="tab" onclick="onTabClick('BSE India', this)">
+                    <span>🏢 BSE</span>
+                </button>
+                <button class="tab-button" role="tab" onclick="onTabClick('NSE India', this)">
+                    <span>🏛️ NSE</span>
+                </button>
+                <button class="tab-button" role="tab" onclick="onTabClick('Indian IPO', this)">
+                    <span>🚀 IPO</span>
+                </button>
+                <button class="tab-button" role="tab" onclick="onTabClick('Indian stocks', this)">
+                    <span>💼 Stocks</span>
+                </button>
+            </div>
+
+            <div class="search-container" role="search" aria-label="Search news">
+                <div class="search-wrapper">
+                    <input id="search-text" type="text" class="news-input" placeholder="Search stocks, companies (e.g., Reliance, TCS, Infosys)" aria-label="Search for stock news">
+                    <button id="search-button" class="search-button">
+                        <i class="bi bi-search"></i> Search
+                    </button>
+                </div>
+            </div>
+
+            <div id="loading" class="loading" style="display: none;" role="status" aria-live="polite">
+                <div class="spinner"></div>
+                <h5>Loading latest news...</h5>
+                <p class="text-muted">Please wait while we fetch the latest updates</p>
+            </div>
+
+            <div id="error" class="error" style="display: none;" role="alert" aria-live="assertive"></div>
+
+            <div class="cards-container" id="cards-container"></div>
+        </div>
+        </div>
+    </section>
+
+
+    <footer class="footer footer-section4 position-relative bg-fixed" data-background="assets/images/footer/footer-bg4.png">
+        <div class="container container-cus">
+            <div class="row justify-content-between align-items-center gy-5 gy-xl-0">                
+                <div class="col-xl-12">
+                    <div class="footer-wrapper4">
+                        <div class="footer-wrapper4-inner">
+                            <div class="line"></div>
+                            <div class="footer__contact wow fadeInUp col-3" data-wow-duration="0.8s">
+                                <div class="footer__logo mb-4">
+                                <a href="index.html">
+                                    <img src="assets/kesar.png" alt="Logo">
+                                </a>
+                            </div>
+                            <p class="mb_40">Kesar Securities empowers investors with trusted advisory, tailored solutions, and expert financial insights.</p>
+                            </div>
+                            <div class="line"></div>
+                            <div class="footer__contact wow fadeInUp col-6" data-wow-duration="0.8s">
+                                <h4 class="footer__title mb-4">Contact</h4>
+                                <div class="footer__content">
+                                    <a href="tel:98191 53214"> <span class="btn_theme social_box"> <i class="bi bi-telephone-plus"></i> </span> 98191 53214 <span></span> </a> 
+                                    <a href="mailto:Support@kesarsecurities.com"><span class="btn_theme social_box"><i class="bi bi-envelope-open"></i></span>Support@kesarsecurities.com</a>
+                                    <a href="https://maps.app.goo.gl/F6GxVqmoWhk66GZu9" target="_blank"> <span class="btn_theme social_box"> <i class="bi bi-geo-alt"></i> </span> 701, Swami Krupa, 16, DL Vaidya Rd, near Akkalkot Swami Maharaj Math, Dadar West, Dadar, Mumbai, Maharashtra 400028 <span></span> </a>
+                                    <a href="https://maps.app.goo.gl/Rp6TfWMJdR3R6vj76" target="_blank"> <span class="btn_theme social_box"> <i class="bi bi-geo-alt"></i> </span> F6 First floor, Rajdhan Heights, Wakhan Rd, Ranjeet Nagar, Aobe Ashokraj Bazar, Karad, Maharashtra 415110 <span></span> </a>
+                                </div>
+                            </div>
+                            <div class="line"></div>
+                            <div class="quick-link wow fadeInRight" data-wow-duration="0.8s">
+                                <h4 class="footer__title mb-4">Quick Link</h4>
+                                <ul>
+                                    <li><a href="index.html">Home</a></li>
+                                    <li><a href="about.html">About us</a></li>
+                                    <li><a href="news.html">News</a></li>
+                                    <li><a href="forms.html">Forms</a></li>
+                                    <li><a href="contact.html">Contact</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="footer-secondary4 d-flex flex-sm-nowrap flex-wrap justify-content-center gap-3 align-items-center justify-content-sm-between">
+                            <p class="copyright text-sm-start text-center">Copyright &copy; <span id="copyYear"></span> <a href="#" class="secondary_color">KesarSecurities</a>. Designed and Developed by MuseOne</p>
+                            <div class="social">
+                                <a href="#" class="btn_theme social_box"><i class="bi bi-facebook"></i><span></span></a>
+                                <a href="#" class="btn_theme social_box"><i class="bi bi-pinterest"></i><span></span></a>
+                                <a href="#" class="btn_theme social_box"><i class="bi bi-twitch"></i><span></span></a>
+                                <a href="#" class="btn_theme social_box"><i class="bi bi-skype"></i><span></span></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- scroll to top -->
+    <a href="#" class="scrollToTop"><i class="bi bi-chevron-double-up"></i></a>
+
+    <!--  js dependencies start  -->
+    <!-- jquery -->
+    <script data-cfasync="false" src="../../../cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="assets/vendor/jquery/jquery-3.6.3.min.js"></script>
+    <!-- bootstrap five js -->
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- nice select js -->
+    <script src="assets/vendor/nice-select/js/jquery.nice-select.min.js"></script>
+    <!-- magnific popup js -->
+    <script src="assets/vendor/magnific-popup/js/jquery.magnific-popup.min.js"></script>
+    <!-- circular-progress-bar -->
+    <script
+        src="../../../../cdn.jsdelivr.net/gh/tomik23/circular-progress-bar%40latest/docs/circularProgressBar.min.js"></script>
+    <!-- slick js -->
+    <script src="assets/vendor/slick/js/slick.min.js"></script>
+    <!-- odometer js -->
+    <script src="assets/vendor/odometer/js/odometer.min.js"></script>
+    <!-- viewport js -->
+    <script src="assets/vendor/viewport/viewport.jquery.js"></script>
+    <!-- jquery ui js -->
+    <script src="assets/vendor/jquery-ui/jquery-ui.min.js"></script>
+    <!-- wow js -->
+    <script src="assets/vendor/wow/wow.min.js"></script>
+
+    <script src="assets/vendor/jquery-validate/jquery.validate.min.js"></script>
+
+    <!--  / js dependencies end  -->
+
+    <!-- plugins js -->
+    <script src="assets/js/plugins.js"></script>
+    <!-- main js -->
+    <script src="assets/js/main.js"></script>
+    <script>
+        const cardsContainer = document.getElementById("cards-container");
+        const loadingDiv = document.getElementById("loading");
+        const errorDiv = document.getElementById("error");
+        const searchButton = document.getElementById("search-button");
+        const searchText = document.getElementById("search-text");
+    
+        window.addEventListener("load", () => fetchNews("sensex"));
+    
+        async function fetchNews(query) {
+            showLoading();
+            hideError();
+            cardsContainer.innerHTML = '';
+    
+            try {
+                // Use the proxy PHP file instead of calling GNews directly
+                const url = `news-proxy.php?q=${encodeURIComponent(query)}`;
+                
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
+                const data = await response.json();
+                hideLoading();
+    
+                if (data.error) {
+                    showError(`⚠️ ${data.error}`);
+                    return;
+                }
+    
+                if (!data.articles || data.articles.length === 0) {
+                    showError("📭 No news articles found. Try a different search term.");
+                    return;
+                }
+    
+                const filteredArticles = data.articles.filter(article => {
+                    const text = `${article.title} ${article.description}`.toLowerCase();
+                    const keywords = ['stock', 'share', 'market', 'nse', 'bse', 'sensex', 'nifty', 'equity', 'trading', 'investor', 'ipo', 'rupee', 'crore', 'financial', 'economy'];
+                    return keywords.some(keyword => text.includes(keyword));
+                });
+    
+                bindData(filteredArticles.length > 0 ? filteredArticles : data.articles);
+            } catch (error) {
+                hideLoading();
+                console.error("Error fetching news:", error);
+                showError("⚠️ Unable to load news. Please check your connection and try again.");
+            }
+        }
+    
+        function bindData(articles) {
+            cardsContainer.innerHTML = "";
+            if (!articles || articles.length === 0) {
+                showError("📭 No articles available at the moment.");
+                return;
+            }
+            articles.forEach(article => {
+                if (!article.url) return;
+                cardsContainer.appendChild(createNewsCard(article));
+            });
+        }
+    
+        function createNewsCard(article) {
+            const card = document.createElement('div');
+            card.className = 'news-card';
+            
+            const date = new Date(article.publishedAt).toLocaleString("en-IN", {
+                timeZone: "Asia/Kolkata",
+                dateStyle: "medium",
+                timeStyle: "short"
+            });
+    
+            card.innerHTML = `
+                <div class="news-card-header">
+                    <img src="${article.image || 'https://via.placeholder.com/400x220/667eea/ffffff?text=No+Image'}" 
+                         alt="${article.title}"
+                         onerror="this.src='https://via.placeholder.com/400x220/667eea/ffffff?text=No+Image'">
+                </div>
+                <div class="news-card-content">
+                    <div class="news-source">
+                        <i class="bi bi-newspaper"></i>
+                        ${article.source.name || "Unknown"}
+                    </div>
+                    <div class="news-date">
+                        <i class="bi bi-clock"></i>
+                        ${date}
+                    </div>
+                    <h3 class="news-title">${article.title || "No title available"}</h3>
+                    <p class="news-desc">${article.description || "No description available"}</p>
+                    <div class="read-more">
+                        Read Full Article <i class="bi bi-arrow-right"></i>
+                    </div>
+                </div>
+            `;
+    
+            card.addEventListener('click', () => window.open(article.url, '_blank'));
+            return card;
+        }
+    
+        function onTabClick(query, element) {
+            fetchNews(query);
+            document.querySelectorAll('.tab-button').forEach(tab => tab.classList.remove('active'));
+            element.classList.add('active');
+        }
+    
+        searchButton.addEventListener("click", () => {
+            const query = searchText.value.trim();
+            if (!query) return;
+            fetchNews(query);
+            document.querySelectorAll('.tab-button').forEach(tab => tab.classList.remove('active'));
+        });
+    
+        searchText.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") {
+                const query = searchText.value.trim();
+                if (!query) return;
+                fetchNews(query);
+                document.querySelectorAll('.tab-button').forEach(tab => tab.classList.remove('active'));
+            }
+        });
+    
+        function showLoading() { loadingDiv.style.display = 'block'; }
+        function hideLoading() { loadingDiv.style.display = 'none'; }
+        function showError(msg) { errorDiv.innerHTML = `<h5>${msg}</h5>`; errorDiv.style.display = 'block'; }
+        function hideError() { errorDiv.style.display = 'none'; }
+    </script>
+    <script src="assets/js/accessibility.js"></script>
+</body>
+</html>

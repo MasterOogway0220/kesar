@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accessible Modern Accordion</title>
+  <style>
+    /* ===== CSS Reset & Base ===== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #f0f2f5;
+      color: #1a1a2e;
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 20px;
+    }
+
+    /* ===== Container ===== */
+    .accordion-wrapper {
+      width: 100%;
+      max-width: 720px;
+    }
+
+    .accordion-wrapper h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #1a1a2e;
+    }
+
+    .accordion-wrapper p.subtitle {
+      font-size: 0.95rem;
+      color: #555;
+      margin-bottom: 28px;
+    }
+
+    /* ===== Accordion Items ===== */
+    .accordion {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .accordion-item {
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+      overflow: hidden;
+      transition: box-shadow 0.25s ease;
+    }
+
+    .accordion-item:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+    }
+
+    /* ===== Accordion Button (Trigger) ===== */
+    .accordion-trigger {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 18px 24px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #1a1a2e;
+      text-align: left;
+      transition: background-color 0.2s ease, color 0.2s ease;
+      position: relative;
+    }
+
+    .accordion-trigger::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 0;
+      background: #4f46e5;
+      border-radius: 0 4px 4px 0;
+      transition: height 0.25s ease;
+    }
+
+    .accordion-trigger:hover {
+      background-color: #f8f7ff;
+    }
+
+    .accordion-trigger:hover::before {
+      height: 60%;
+    }
+
+    /* Focus visible — keyboard users see a clear outline (WCAG 2.4.7) */
+    .accordion-trigger:focus-visible {
+      outline: 3px solid #4f46e5;
+      outline-offset: -3px;
+      background-color: #f0eeff;
+    }
+
+    /* Hide the default focus ring for mouse clicks */
+    .accordion-trigger:focus:not(:focus-visible) {
+      outline: none;
+    }
+
+    /* Active / expanded state */
+    .accordion-trigger[aria-expanded="true"] {
+      color: #4f46e5;
+    }
+
+    .accordion-trigger[aria-expanded="true"]::before {
+      height: 60%;
+    }
+
+    /* ===== Chevron Icon ===== */
+    .accordion-icon {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      margin-left: 16px;
+      transition: transform 0.3s ease;
+      color: #6b7280;
+    }
+
+    .accordion-trigger[aria-expanded="true"] .accordion-icon {
+      transform: rotate(180deg);
+      color: #4f46e5;
+    }
+
+    /* ===== Accordion Panel (Content) ===== */
+    .accordion-panel {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease, padding 0.35s ease;
+    }
+
+    .accordion-panel[aria-hidden="false"] {
+      max-height: 600px;
+    }
+
+    .accordion-panel-inner {
+      padding: 0 24px 20px 24px;
+      font-size: 0.95rem;
+      color: #4b5563;
+      line-height: 1.7;
+    }
+
+    .accordion-panel-inner a {
+      color: #4f46e5;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .accordion-panel-inner a:focus-visible {
+      outline: 2px solid #4f46e5;
+      outline-offset: 2px;
+      border-radius: 2px;
+    }
+
+    .accordion-panel-inner ul {
+      margin-top: 8px;
+      padding-left: 20px;
+    }
+
+    .accordion-panel-inner ul li {
+      margin-bottom: 4px;
+    }
+
+    /* ===== Skip Link for keyboard users (WCAG 2.4.1) ===== */
+    .skip-link {
+      position: absolute;
+      top: -100%;
+      left: 16px;
+      background: #4f46e5;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 0 0 8px 8px;
+      font-weight: 600;
+      z-index: 100;
+      transition: top 0.2s ease;
+      text-decoration: none;
+    }
+
+    .skip-link:focus {
+      top: 0;
+    }
+
+    /* ===== Responsive (WCAG 1.4.10 — no 2D scroll at 320px) ===== */
+    @media (max-width: 480px) {
+      body {
+        padding: 20px 12px;
+      }
+
+      .accordion-trigger {
+        padding: 16px 16px;
+        font-size: 0.95rem;
+      }
+
+      .accordion-panel-inner {
+        padding: 0 16px 16px 16px;
+        font-size: 0.9rem;
+      }
+
+      .accordion-wrapper h1 {
+        font-size: 1.4rem;
+      }
+    }
+
+    /* ===== High contrast / forced colors (WCAG 1.4.11) ===== */
+    @media (forced-colors: active) {
+      .accordion-trigger {
+        border: 1px solid ButtonText;
+      }
+
+      .accordion-trigger:focus-visible {
+        outline: 3px solid Highlight;
+      }
+
+      .accordion-trigger[aria-expanded="true"] {
+        border-color: Highlight;
+      }
+    }
+
+    /* ===== Reduced motion preference ===== */
+    @media (prefers-reduced-motion: reduce) {
+      .accordion-panel,
+      .accordion-icon,
+      .accordion-trigger::before,
+      .accordion-item {
+        transition: none;
+      }
+    }
+
+    /* ===== Screen-reader only utility ===== */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Skip link for keyboard/screen reader users (WCAG 2.4.1) -->
+  <a href="#accordion" class="skip-link">Skip to accordion content</a>
+
+  <main class="accordion-wrapper" role="main">
+    <h1 id="accordion-heading">Frequently Asked Questions</h1>
+    <p class="subtitle">Click or press Enter/Space on a question to reveal the answer.</p>
+
+    <!-- Accordion region labelled by heading (WCAG 4.1.2) -->
+    <div class="accordion" id="accordion" role="region" aria-labelledby="accordion-heading">
+
+      <!-- Item 1 -->
+      <div class="accordion-item">
+        <h2>
+          <button
+            class="accordion-trigger"
+            id="trigger-1"
+            aria-expanded="false"
+            aria-controls="panel-1"
+          >
+            <span>What is web accessibility?</span>
+            <svg class="accordion-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+        </h2>
+        <div
+          class="accordion-panel"
+          id="panel-1"
+          role="region"
+          aria-labelledby="trigger-1"
+          aria-hidden="true"
+        >
+          <div class="accordion-panel-inner">
+            Web accessibility means that websites, tools, and technologies are designed and developed so that people with disabilities can use them. It ensures equal access to information and functionality for everyone, including people who are blind, deaf, have motor impairments, or cognitive disabilities. The international standard for web accessibility is the <a href="https://www.w3.org/TR/WCAG21/" target="_blank" rel="noopener noreferrer">WCAG 2.1 guidelines</a>.
+          </div>
+        </div>
+      </div>
+
+      <!-- Item 2 -->
+      <div class="accordion-item">
+        <h2>
+          <button
+            class="accordion-trigger"
+            id="trigger-2"
+            aria-expanded="false"
+            aria-controls="panel-2"
+          >
+            <span>How does this accordion support screen readers?</span>
+            <svg class="accordion-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+        </h2>
+        <div
+          class="accordion-panel"
+          id="panel-2"
+          role="region"
+          aria-labelledby="trigger-2"
+          aria-hidden="true"
+        >
+          <div class="accordion-panel-inner">
+            This accordion uses proper ARIA attributes to communicate its state to assistive technologies:
+            <ul>
+              <li><strong>aria-expanded</strong> tells screen readers whether a section is open or closed.</li>
+              <li><strong>aria-controls</strong> links each button to its corresponding content panel.</li>
+              <li><strong>aria-hidden</strong> hides collapsed content from the accessibility tree.</li>
+              <li><strong>role="region"</strong> and <strong>aria-labelledby</strong> give each panel a descriptive name.</li>
+            </ul>
+            Screen readers like NVDA, JAWS, and VoiceOver will announce "collapsed" or "expanded" when navigating the buttons.
+          </div>
+        </div>
+      </div>
+
+      <!-- Item 3 -->
+      <div class="accordion-item">
+        <h2>
+          <button
+            class="accordion-trigger"
+            id="trigger-3"
+            aria-expanded="false"
+            aria-controls="panel-3"
+          >
+            <span>What keyboard shortcuts are supported?</span>
+            <svg class="accordion-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+        </h2>
+        <div
+          class="accordion-panel"
+          id="panel-3"
+          role="region"
+          aria-labelledby="trigger-3"
+          aria-hidden="true"
+        >
+          <div class="accordion-panel-inner">
+            Full keyboard navigation is supported following the WAI-ARIA Accordion Pattern:
+            <ul>
+              <li><strong>Tab / Shift+Tab</strong> — Move focus between accordion headers and other focusable elements.</li>
+              <li><strong>Enter or Space</strong> — Toggle the focused accordion section open or closed.</li>
+              <li><strong>Arrow Down</strong> — Move focus to the next accordion header.</li>
+              <li><strong>Arrow Up</strong> — Move focus to the previous accordion header.</li>
+              <li><strong>Home</strong> — Move focus to the first accordion header.</li>
+              <li><strong>End</strong> — Move focus to the last accordion header.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Item 4 -->
+      <div class="accordion-item">
+        <h2>
+          <button
+            class="accordion-trigger"
+            id="trigger-4"
+            aria-expanded="false"
+            aria-controls="panel-4"
+          >
+            <span>How is colour contrast handled?</span>
+            <svg class="accordion-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+        </h2>
+        <div
+          class="accordion-panel"
+          id="panel-4"
+          role="region"
+          aria-labelledby="trigger-4"
+          aria-hidden="true"
+        >
+          <div class="accordion-panel-inner">
+            All text and interactive elements meet WCAG 2.1 contrast requirements. The heading text (#1a1a2e on #ffffff) exceeds the 4.5:1 minimum ratio for normal text. The body text (#4b5563 on #ffffff) also meets the 4.5:1 ratio. The active indicator colour (#4f46e5) against white provides a 6.1:1 ratio, well above the 3:1 requirement for UI components. The design also respects <strong>forced-colors</strong> mode for Windows High Contrast users.
+          </div>
+        </div>
+      </div>
+
+      <!-- Item 5 -->
+      <div class="accordion-item">
+        <h2>
+          <button
+            class="accordion-trigger"
+            id="trigger-5"
+            aria-expanded="false"
+            aria-controls="panel-5"
+          >
+            <span>Is this accordion responsive and mobile-friendly?</span>
+            <svg class="accordion-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+        </h2>
+        <div
+          class="accordion-panel"
+          id="panel-5"
+          role="region"
+          aria-labelledby="trigger-5"
+          aria-hidden="true"
+        >
+          <div class="accordion-panel-inner">
+            Yes. The accordion uses a fluid layout that works seamlessly across all screen sizes. It does not require horizontal scrolling at a viewport width of 320 CSS pixels, meeting WCAG 1.4.10 (Reflow). Touch targets are generously sized for mobile users, and the design does not lock to portrait or landscape orientation (WCAG 1.3.4). All text can be resized up to 200% without loss of content (WCAG 1.4.4).
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <!-- End accordion -->
+
+    <!-- Live region for screen reader announcements (WCAG 4.1.3) -->
+    <div aria-live="polite" aria-atomic="true" class="sr-only" id="accordion-live"></div>
+  </main>
+
+  <script>
+    (function () {
+      'use strict';
+
+      var triggers = Array.from(document.querySelectorAll('.accordion-trigger'));
+      var liveRegion = document.getElementById('accordion-live');
+
+      /**
+       * Toggle a single accordion panel.
+       */
+      function togglePanel(trigger) {
+        var isExpanded = trigger.getAttribute('aria-expanded') === 'true';
+        var shouldOpen = !isExpanded;
+
+        var panelId = trigger.getAttribute('aria-controls');
+        var panel = document.getElementById(panelId);
+        if (!panel) return;
+
+        trigger.setAttribute('aria-expanded', String(shouldOpen));
+        panel.setAttribute('aria-hidden', String(!shouldOpen));
+
+        // Announce state change to screen readers (WCAG 4.1.3)
+        var label = trigger.querySelector('span').textContent.trim();
+        liveRegion.textContent = shouldOpen
+          ? label + ' section expanded'
+          : label + ' section collapsed';
+      }
+
+      /**
+       * Move focus to a specific trigger by index, wrapping around.
+       */
+      function focusTrigger(index) {
+        var len = triggers.length;
+        var target = triggers[((index % len) + len) % len];
+        target.focus();
+      }
+
+      // Attach click handlers
+      triggers.forEach(function (trigger) {
+        trigger.addEventListener('click', function () {
+          togglePanel(trigger);
+        });
+      });
+
+      // Keyboard navigation (WCAG 2.1.1, WAI-ARIA Accordion pattern)
+      document.querySelector('.accordion').addEventListener('keydown', function (e) {
+        var target = e.target;
+        if (!target.classList.contains('accordion-trigger')) return;
+
+        var currentIndex = triggers.indexOf(target);
+
+        switch (e.key) {
+          case 'ArrowDown':
+            e.preventDefault();
+            focusTrigger(currentIndex + 1);
+            break;
+
+          case 'ArrowUp':
+            e.preventDefault();
+            focusTrigger(currentIndex - 1);
+            break;
+
+          case 'Home':
+            e.preventDefault();
+            focusTrigger(0);
+            break;
+
+          case 'End':
+            e.preventDefault();
+            focusTrigger(triggers.length - 1);
+            break;
+        }
+      });
+    })();
+  </script>
+
+</body>
+</html>
