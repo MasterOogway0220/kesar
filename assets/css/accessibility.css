@@ -246,11 +246,13 @@ body {
     box-shadow: -4px 0 30px rgba(0, 0, 0, 0.25);
     transition: right 0.35s ease;
     overflow-y: auto;
+    pointer-events: none;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 .a11y-widget-panel.open {
     right: 0;
+    pointer-events: auto;
 }
 
 .a11y-widget-overlay {
@@ -263,12 +265,14 @@ body {
     z-index: 10001;
     opacity: 0;
     visibility: hidden;
+    pointer-events: none;
     transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .a11y-widget-overlay.open {
     opacity: 1;
     visibility: visible;
+    pointer-events: auto;
 }
 
 .a11y-panel-header {
@@ -540,11 +544,17 @@ body.a11y-reading-guide-on .a11y-reading-guide {
 }
 
 /* ===== 23. Stop Animations ===== */
-body.a11y-stop-animations *,
-body.a11y-stop-animations *::before,
-body.a11y-stop-animations *::after {
+body.a11y-stop-animations *:not(.preloader):not(.loader),
+body.a11y-stop-animations *:not(.preloader):not(.loader)::before,
+body.a11y-stop-animations *:not(.preloader):not(.loader)::after {
     animation: none !important;
     transition: none !important;
+}
+
+/* Always allow preloader to be hidden */
+body.a11y-stop-animations .preloader[style*="display: none"],
+body.a11y-stop-animations .preloader[style*="opacity: 0"] {
+    display: none !important;
 }
 
 /* ===== 24. Hide Images (for screen reader users who want less clutter) ===== */

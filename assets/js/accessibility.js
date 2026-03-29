@@ -52,10 +52,11 @@
         });
         observer.observe(preloader, { attributes: true, attributeFilter: ['style', 'class'] });
 
-        // Fallback: hide after 5 seconds
+        // Fallback: force hide after 3 seconds (in case animations are disabled)
         setTimeout(function () {
             preloader.setAttribute('aria-hidden', 'true');
-        }, 5000);
+            preloader.style.display = 'none';
+        }, 3000);
     }
 
     // ===== 3. NAVBAR TOGGLER FIX (WCAG 4.1.2) =====
