@@ -201,19 +201,19 @@ body {
     position: fixed;
     bottom: 80px;
     right: 20px;
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    height: 56px;
     background: #2660B5;
     color: #ffffff;
     border: none;
     border-radius: 50%;
-    font-size: 1.5rem;
+    font-size: 1.6rem;
     cursor: pointer;
-    z-index: 9999;
+    z-index: 10001;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
     transition: background 0.3s ease, transform 0.3s ease;
 }
 
@@ -227,24 +227,355 @@ body {
     outline-offset: 2px !important;
 }
 
-/* ===== 13. Font Size Override Classes ===== */
-body.font-size-large {
-    font-size: 120% !important;
+.a11y-widget-trigger .a11y-icon {
+    width: 28px;
+    height: 28px;
+    fill: currentColor;
 }
 
-body.font-size-larger {
-    font-size: 140% !important;
+/* ===== 13. Accessibility Widget Panel ===== */
+.a11y-widget-panel {
+    position: fixed;
+    top: 0;
+    right: -420px;
+    width: 400px;
+    max-width: 90vw;
+    height: 100vh;
+    background: #ffffff;
+    z-index: 10002;
+    box-shadow: -4px 0 30px rgba(0, 0, 0, 0.25);
+    transition: right 0.35s ease;
+    overflow-y: auto;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-body.font-size-largest {
-    font-size: 160% !important;
+.a11y-widget-panel.open {
+    right: 0;
 }
 
-/* ===== 14. High Contrast Mode Classes ===== */
-body.high-contrast {
+.a11y-widget-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 10001;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.a11y-widget-overlay.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.a11y-panel-header {
+    background: #2660B5;
+    color: #ffffff;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.a11y-panel-header h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.a11y-panel-header h2 svg {
+    width: 24px;
+    height: 24px;
+    fill: #ffffff;
+}
+
+.a11y-panel-close {
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.a11y-panel-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.a11y-panel-body {
+    padding: 16px 20px 100px;
+}
+
+.a11y-section {
+    margin-bottom: 24px;
+}
+
+.a11y-section-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: #6b7280;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.a11y-options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.a11y-option-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 14px 8px;
+    background: #f3f4f6;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #374151;
+    text-align: center;
+    min-height: 80px;
+}
+
+.a11y-option-btn:hover {
+    background: #e0e7ff;
+    border-color: #2660B5;
+}
+
+.a11y-option-btn.active {
+    background: #dbeafe;
+    border-color: #2660B5;
+    color: #1e40af;
+    box-shadow: 0 0 0 3px rgba(38, 96, 181, 0.15);
+}
+
+.a11y-option-btn svg,
+.a11y-option-btn .a11y-opt-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 1.5rem;
+}
+
+.a11y-option-btn span {
+    font-size: 0.75rem;
+    line-height: 1.2;
+}
+
+/* Font size slider */
+.a11y-font-control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: #f3f4f6;
+    border-radius: 12px;
+    border: 2px solid #e5e7eb;
+}
+
+.a11y-font-control label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #374151;
+    white-space: nowrap;
+}
+
+.a11y-font-control .a11y-font-btns {
+    display: flex;
+    gap: 6px;
+    flex: 1;
+    justify-content: flex-end;
+}
+
+.a11y-font-btn {
+    width: 38px;
+    height: 38px;
+    border: 2px solid #d1d5db;
+    background: #ffffff;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: #374151;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.a11y-font-btn:hover {
+    border-color: #2660B5;
+    background: #e0e7ff;
+}
+
+.a11y-font-btn.active {
+    background: #2660B5;
+    color: #ffffff;
+    border-color: #2660B5;
+}
+
+/* Reset button */
+.a11y-reset-btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    background: #fee2e2;
+    border: 2px solid #fca5a5;
+    border-radius: 12px;
+    color: #dc2626;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    margin-top: 8px;
+}
+
+.a11y-reset-btn:hover {
+    background: #fecaca;
+    border-color: #f87171;
+}
+
+/* ===== 14. Font Size Override Classes ===== */
+body.a11y-font-1 { font-size: 100% !important; }
+body.a11y-font-2 { font-size: 115% !important; }
+body.a11y-font-3 { font-size: 130% !important; }
+body.a11y-font-4 { font-size: 150% !important; }
+
+/* ===== 15. High Contrast Mode ===== */
+body.a11y-high-contrast {
     filter: contrast(1.5);
 }
-
-body.high-contrast img {
+body.a11y-high-contrast img {
     filter: contrast(0.75);
+}
+
+/* ===== 16. Invert Colors ===== */
+body.a11y-invert {
+    filter: invert(1) hue-rotate(180deg);
+}
+body.a11y-invert img,
+body.a11y-invert video {
+    filter: invert(1) hue-rotate(180deg);
+}
+
+/* ===== 17. Grayscale ===== */
+body.a11y-grayscale {
+    filter: grayscale(1);
+}
+
+/* ===== 18. Highlight Links ===== */
+body.a11y-highlight-links a {
+    outline: 3px solid #ff6600 !important;
+    outline-offset: 2px !important;
+    background: #fff3cd !important;
+    color: #000000 !important;
+    text-decoration: underline !important;
+}
+
+/* ===== 19. Big Cursor ===== */
+body.a11y-big-cursor,
+body.a11y-big-cursor * {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24'%3E%3Cpath d='M5 3l14 8-6.5 1.5L11 19z' fill='%23000' stroke='%23fff' stroke-width='1'/%3E%3C/svg%3E"), auto !important;
+}
+
+/* ===== 20. Text Spacing ===== */
+body.a11y-text-spacing {
+    letter-spacing: 0.12em !important;
+    word-spacing: 0.16em !important;
+}
+body.a11y-text-spacing p,
+body.a11y-text-spacing li,
+body.a11y-text-spacing span,
+body.a11y-text-spacing td {
+    line-height: 1.8 !important;
+}
+
+/* ===== 21. Dyslexia-Friendly Font ===== */
+body.a11y-dyslexia-font,
+body.a11y-dyslexia-font * {
+    font-family: 'OpenDyslexic', 'Comic Sans MS', 'Verdana', sans-serif !important;
+}
+
+/* ===== 22. Reading Guide ===== */
+.a11y-reading-guide {
+    position: fixed;
+    left: 0;
+    width: 100%;
+    height: 12px;
+    background: rgba(255, 204, 0, 0.4);
+    border-top: 2px solid rgba(255, 153, 0, 0.6);
+    border-bottom: 2px solid rgba(255, 153, 0, 0.6);
+    pointer-events: none;
+    z-index: 99999;
+    display: none;
+}
+
+body.a11y-reading-guide-on .a11y-reading-guide {
+    display: block;
+}
+
+/* ===== 23. Stop Animations ===== */
+body.a11y-stop-animations *,
+body.a11y-stop-animations *::before,
+body.a11y-stop-animations *::after {
+    animation: none !important;
+    transition: none !important;
+}
+
+/* ===== 24. Hide Images (for screen reader users who want less clutter) ===== */
+body.a11y-hide-images img:not(.logo):not([src*="logo"]) {
+    opacity: 0.1;
+}
+
+/* ===== 25. Saturation ===== */
+body.a11y-low-saturation {
+    filter: saturate(0.5);
+}
+body.a11y-high-saturation {
+    filter: saturate(2);
+}
+
+/* ===== 26. Combined filter handling (only one filter at a time) ===== */
+body.a11y-high-contrast.a11y-grayscale { filter: contrast(1.5) grayscale(1); }
+body.a11y-high-contrast.a11y-low-saturation { filter: contrast(1.5) saturate(0.5); }
+
+/* ===== 27. Panel responsive ===== */
+@media (max-width: 480px) {
+    .a11y-widget-panel {
+        width: 100vw;
+        right: -100vw;
+    }
+    .a11y-options-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+    .a11y-option-btn {
+        padding: 10px 6px;
+        min-height: 70px;
+    }
 }

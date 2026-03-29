@@ -557,6 +557,295 @@
         });
     }
 
+    // ===== 16. ACCESSIBILITY WIDGET =====
+    var STORAGE_KEY = 'kesarA11yPrefs';
+
+    function getPrefs() {
+        try {
+            return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+        } catch (e) {
+            return {};
+        }
+    }
+
+    function savePrefs(prefs) {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
+        } catch (e) { /* silent */ }
+    }
+
+    function createWidgetHTML() {
+        // Floating trigger button
+        var trigger = document.createElement('button');
+        trigger.className = 'a11y-widget-trigger';
+        trigger.setAttribute('aria-label', 'Open accessibility settings');
+        trigger.setAttribute('title', 'Accessibility Settings');
+        trigger.innerHTML = '<svg class="a11y-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm-1 6h2c2.21 0 4 .45 4 1v1h-3v10h-1v-5h-2v5H10V10H7V9c0-.55 1.79-1 4-1z"/></svg>';
+        document.body.appendChild(trigger);
+
+        // Overlay
+        var overlay = document.createElement('div');
+        overlay.className = 'a11y-widget-overlay';
+        overlay.id = 'a11y-overlay';
+        document.body.appendChild(overlay);
+
+        // Panel
+        var panel = document.createElement('div');
+        panel.className = 'a11y-widget-panel';
+        panel.id = 'a11y-panel';
+        panel.setAttribute('role', 'dialog');
+        panel.setAttribute('aria-label', 'Accessibility Settings');
+        panel.setAttribute('aria-modal', 'true');
+        panel.innerHTML =
+            '<div class="a11y-panel-header">' +
+                '<h2><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm-1 6h2c2.21 0 4 .45 4 1v1h-3v10h-1v-5h-2v5H10V10H7V9c0-.55 1.79-1 4-1z"/></svg> Accessibility</h2>' +
+                '<button class="a11y-panel-close" aria-label="Close accessibility settings">&times;</button>' +
+            '</div>' +
+            '<div class="a11y-panel-body">' +
+
+                '<!-- Vision Section -->' +
+                '<div class="a11y-section">' +
+                    '<div class="a11y-section-title">Vision</div>' +
+                    '<div class="a11y-font-control">' +
+                        '<label>Font Size</label>' +
+                        '<div class="a11y-font-btns">' +
+                            '<button class="a11y-font-btn" data-size="1" aria-label="Default font size">A</button>' +
+                            '<button class="a11y-font-btn" data-size="2" aria-label="Large font size" style="font-size:1rem">A</button>' +
+                            '<button class="a11y-font-btn" data-size="3" aria-label="Larger font size" style="font-size:1.15rem">A</button>' +
+                            '<button class="a11y-font-btn" data-size="4" aria-label="Largest font size" style="font-size:1.3rem">A</button>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="a11y-options-grid" style="margin-top:10px">' +
+                        '<button class="a11y-option-btn" data-feature="high-contrast"><span class="a11y-opt-icon" aria-hidden="true">&#9681;</span><span>High Contrast</span></button>' +
+                        '<button class="a11y-option-btn" data-feature="invert"><span class="a11y-opt-icon" aria-hidden="true">&#9789;</span><span>Invert Colors</span></button>' +
+                        '<button class="a11y-option-btn" data-feature="grayscale"><span class="a11y-opt-icon" aria-hidden="true">&#9898;</span><span>Grayscale</span></button>' +
+                        '<button class="a11y-option-btn" data-feature="low-saturation"><span class="a11y-opt-icon" aria-hidden="true">&#127752;</span><span>Low Saturation</span></button>' +
+                        '<button class="a11y-option-btn" data-feature="hide-images"><span class="a11y-opt-icon" aria-hidden="true">&#128247;</span><span>Hide Images</span></button>' +
+                        '<button class="a11y-option-btn" data-feature="dyslexia-font"><span class="a11y-opt-icon" aria-hidden="true">Aa</span><span>Dyslexia Font</span></button>' +
+                    '</div>' +
+                '</div>' +
+
+                '<!-- Navigation Section -->' +
+                '<div class="a11y-section">' +
+                    '<div class="a11y-section-title">Navigation & Reading</div>' +
+                    '<div class="a11y-options-grid">' +
+                        '<button class="a11y-option-btn" data-feature="highlight-links"><span class="a11y-opt-icon" aria-hidden="true">&#128279;</span><span>Highlight Links</span></button>' +
+                        '<button class="a11y-option-btn" data-feature="big-cursor"><span class="a11y-opt-icon" aria-hidden="true">&#128433;</span><span>Big Cursor</span></button>' +
+                        '<button class="a11y-option-btn" data-feature="reading-guide"><span class="a11y-opt-icon" aria-hidden="true">&#128214;</span><span>Reading Guide</span></button>' +
+                        '<button class="a11y-option-btn" data-feature="text-spacing"><span class="a11y-opt-icon" aria-hidden="true">&#8596;</span><span>Text Spacing</span></button>' +
+                        '<button class="a11y-option-btn" data-feature="stop-animations"><span class="a11y-opt-icon" aria-hidden="true">&#9209;</span><span>Stop Animations</span></button>' +
+                    '</div>' +
+                '</div>' +
+
+                '<!-- Reset -->' +
+                '<div class="a11y-section">' +
+                    '<button class="a11y-reset-btn">Reset All Settings</button>' +
+                '</div>' +
+
+            '</div>';
+
+        document.body.appendChild(panel);
+
+        // Reading guide element
+        var guide = document.createElement('div');
+        guide.className = 'a11y-reading-guide';
+        guide.id = 'a11y-reading-guide';
+        document.body.appendChild(guide);
+
+        return { trigger: trigger, overlay: overlay, panel: panel, guide: guide };
+    }
+
+    function initWidget() {
+        var els = createWidgetHTML();
+        var panel = els.panel;
+        var overlay = els.overlay;
+        var trigger = els.trigger;
+        var guide = els.guide;
+
+        // Filter features (only one filter active at a time)
+        var filterFeatures = ['high-contrast', 'invert', 'grayscale', 'low-saturation'];
+        var bodyToggleMap = {
+            'high-contrast': 'a11y-high-contrast',
+            'invert': 'a11y-invert',
+            'grayscale': 'a11y-grayscale',
+            'low-saturation': 'a11y-low-saturation',
+            'highlight-links': 'a11y-highlight-links',
+            'big-cursor': 'a11y-big-cursor',
+            'text-spacing': 'a11y-text-spacing',
+            'dyslexia-font': 'a11y-dyslexia-font',
+            'stop-animations': 'a11y-stop-animations',
+            'hide-images': 'a11y-hide-images',
+            'reading-guide': 'a11y-reading-guide-on'
+        };
+
+        function openPanel() {
+            panel.classList.add('open');
+            overlay.classList.add('open');
+            trigger.setAttribute('aria-expanded', 'true');
+            panel.querySelector('.a11y-panel-close').focus();
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePanel() {
+            panel.classList.remove('open');
+            overlay.classList.remove('open');
+            trigger.setAttribute('aria-expanded', 'false');
+            trigger.focus();
+            document.body.style.overflow = '';
+        }
+
+        trigger.addEventListener('click', openPanel);
+        overlay.addEventListener('click', closePanel);
+        panel.querySelector('.a11y-panel-close').addEventListener('click', closePanel);
+
+        // Trap focus inside panel
+        panel.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') { closePanel(); return; }
+            if (e.key !== 'Tab') return;
+            var focusable = panel.querySelectorAll('button, [tabindex]:not([tabindex="-1"])');
+            var first = focusable[0];
+            var last = focusable[focusable.length - 1];
+            if (e.shiftKey && document.activeElement === first) {
+                e.preventDefault(); last.focus();
+            } else if (!e.shiftKey && document.activeElement === last) {
+                e.preventDefault(); first.focus();
+            }
+        });
+
+        // Apply a feature
+        function applyFeature(feature, active) {
+            var cls = bodyToggleMap[feature];
+            if (!cls) return;
+
+            // If it's a filter feature, remove other filters first
+            if (filterFeatures.indexOf(feature) !== -1 && active) {
+                filterFeatures.forEach(function (f) {
+                    if (f !== feature) {
+                        document.body.classList.remove(bodyToggleMap[f]);
+                        var otherBtn = panel.querySelector('[data-feature="' + f + '"]');
+                        if (otherBtn) otherBtn.classList.remove('active');
+                    }
+                });
+            }
+
+            if (active) {
+                document.body.classList.add(cls);
+            } else {
+                document.body.classList.remove(cls);
+            }
+        }
+
+        function applyFontSize(size) {
+            for (var i = 1; i <= 4; i++) {
+                document.body.classList.remove('a11y-font-' + i);
+            }
+            if (size && size > 1) {
+                document.body.classList.add('a11y-font-' + size);
+            }
+            // Update button states
+            var fontBtns = panel.querySelectorAll('.a11y-font-btn');
+            fontBtns.forEach(function (btn) {
+                btn.classList.toggle('active', parseInt(btn.getAttribute('data-size')) === size);
+            });
+        }
+
+        // Load saved preferences
+        function loadPrefs() {
+            var prefs = getPrefs();
+            if (prefs.fontSize) applyFontSize(prefs.fontSize);
+            if (prefs.features) {
+                Object.keys(prefs.features).forEach(function (feature) {
+                    if (prefs.features[feature]) {
+                        applyFeature(feature, true);
+                        var btn = panel.querySelector('[data-feature="' + feature + '"]');
+                        if (btn) btn.classList.add('active');
+                    }
+                });
+            }
+        }
+
+        // Save current state
+        function saveCurrentPrefs() {
+            var prefs = { fontSize: 1, features: {} };
+            for (var i = 1; i <= 4; i++) {
+                if (document.body.classList.contains('a11y-font-' + i)) {
+                    prefs.fontSize = i;
+                }
+            }
+            Object.keys(bodyToggleMap).forEach(function (feature) {
+                prefs.features[feature] = document.body.classList.contains(bodyToggleMap[feature]);
+            });
+            savePrefs(prefs);
+        }
+
+        // Feature toggle buttons
+        var optionBtns = panel.querySelectorAll('.a11y-option-btn');
+        optionBtns.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var feature = btn.getAttribute('data-feature');
+                var isActive = btn.classList.contains('active');
+
+                // For filter features, deactivate others
+                if (filterFeatures.indexOf(feature) !== -1 && !isActive) {
+                    filterFeatures.forEach(function (f) {
+                        var otherBtn = panel.querySelector('[data-feature="' + f + '"]');
+                        if (otherBtn) otherBtn.classList.remove('active');
+                    });
+                }
+
+                btn.classList.toggle('active');
+                applyFeature(feature, !isActive);
+                saveCurrentPrefs();
+
+                var label = btn.querySelector('span:last-child').textContent;
+                window.a11yAnnounce(label + (isActive ? ' disabled' : ' enabled'));
+            });
+        });
+
+        // Font size buttons
+        var fontBtns = panel.querySelectorAll('.a11y-font-btn');
+        fontBtns.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var size = parseInt(btn.getAttribute('data-size'));
+                applyFontSize(size);
+                saveCurrentPrefs();
+                var labels = { 1: 'Default', 2: 'Large', 3: 'Larger', 4: 'Largest' };
+                window.a11yAnnounce('Font size set to ' + labels[size]);
+            });
+        });
+
+        // Reading guide - follows mouse
+        document.addEventListener('mousemove', function (e) {
+            if (document.body.classList.contains('a11y-reading-guide-on')) {
+                guide.style.top = (e.clientY - 6) + 'px';
+            }
+        });
+
+        // Reset button
+        panel.querySelector('.a11y-reset-btn').addEventListener('click', function () {
+            // Remove all accessibility classes
+            Object.keys(bodyToggleMap).forEach(function (feature) {
+                document.body.classList.remove(bodyToggleMap[feature]);
+            });
+            for (var i = 1; i <= 4; i++) {
+                document.body.classList.remove('a11y-font-' + i);
+            }
+            // Reset UI
+            panel.querySelectorAll('.a11y-option-btn.active').forEach(function (btn) {
+                btn.classList.remove('active');
+            });
+            panel.querySelectorAll('.a11y-font-btn.active').forEach(function (btn) {
+                btn.classList.remove('active');
+            });
+            // Clear storage
+            try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* silent */ }
+            window.a11yAnnounce('All accessibility settings have been reset');
+        });
+
+        // Load prefs on start
+        loadPrefs();
+    }
+
     // ===== INITIALIZE ALL =====
     function init() {
         initSkipLink();
@@ -573,6 +862,7 @@
         fixHeadingHierarchy();
         enhanceExternalLinks();
         enhanceTables();
+        initWidget();
 
         // Delay slider enhancement to wait for slick init
         setTimeout(enhanceSliders, 2000);
