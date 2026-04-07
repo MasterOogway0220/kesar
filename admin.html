@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin — Kesar Securities Stock Talk</title>
+    <link rel="shortcut icon" href="assets/kesarnew.png" type="image/x-icon">
+    <link rel="stylesheet" href="assets/vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/bootstrap-icons.css">
+    <style>
+        body { background: #f4f6fb; }
+        .admin-wrapper { max-width: 960px; margin: 0 auto; padding: 30px 15px; }
+        .brand-bar {
+            background: #2660B5;
+            color: #fff;
+            padding: 14px 24px;
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .brand-bar h1 { font-size: 1.2rem; margin: 0; font-weight: 600; }
+        .panel-card { background: #fff; border-radius: 0 0 10px 10px; box-shadow: 0 4px 20px rgba(0,0,0,.08); }
+        .panel-body { padding: 30px; }
+        .entry-row {
+            border: 1px solid #e3e8f0;
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            background: #fafbfd;
+        }
+        .entry-thumb { width: 120px; flex-shrink: 0; border-radius: 6px; overflow: hidden; }
+        .entry-thumb img { width: 100%; display: block; }
+        .entry-meta { flex: 1; min-width: 0; }
+        .entry-meta strong { display: block; margin-bottom: 4px; font-size: .95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .entry-meta small { color: #888; font-size: .8rem; }
+        .btn-del { flex-shrink: 0; }
+        #login-section { max-width: 400px; margin: 80px auto; }
+        .form-label { font-weight: 500; }
+        .alert { display: none; }
+    </style>
+</head>
+<body>
+
+<!-- ===== LOGIN SECTION ===== -->
+<div id="login-section">
+    <div class="text-center mb-4">
+        <img src="assets/kesar.png" alt="Kesar Securities" style="height:50px">
+        <h5 class="mt-3 fw-bold">Stock Talk Admin</h5>
+    </div>
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+            <h6 class="mb-3 fw-bold">Sign In</h6>
+            <div id="login-error" class="alert alert-danger" role="alert"></div>
+            <div class="mb-3">
+                <label class="form-label" for="login-user">Username</label>
+                <input type="text" id="login-user" class="form-control" placeholder="kesar" autocomplete="username">
+            </div>
+            <div class="mb-4">
+                <label class="form-label" for="login-pass">Password</label>
+                <input type="password" id="login-pass" class="form-control" placeholder="••••••" autocomplete="current-password">
+            </div>
+            <button class="btn btn-primary w-100" id="login-btn">
+                <span id="login-spinner" class="spinner-border spinner-border-sm me-2 d-none"></span>
+                Sign In
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== ADMIN SECTION (hidden until logged in) ===== -->
+<div id="admin-section" class="admin-wrapper" style="display:none">
+    <div class="brand-bar">
+        <h1><i class="bi bi-bar-chart-line-fill me-2"></i>Stock Talk Admin</h1>
+        <button class="btn btn-sm btn-outline-light" id="logout-btn">
+            <i class="bi bi-box-arrow-right me-1"></i>Logout
+        </button>
+    </div>
+    <div class="panel-card">
+        <div class="panel-body">
+
+            <!-- ADD FORM -->
+            <h5 class="mb-3 fw-bold">Add New Stock Call</h5>
+            <div id="add-error" class="alert alert-danger" role="alert"></div>
+            <div id="add-success" class="alert alert-success" role="alert"></div>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label" for="f-embedUrl">YouTube Embed URL <span class="text-danger">*</span></label>
+                    <input type="url" id="f-embedUrl" class="form-control" placeholder="https://www.youtube.com/embed/XXXXXXXXXXX">
+                    <div class="form-text">Example: https://www.youtube.com/embed/ABC123xyz</div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label" for="f-watchUrl">Watch URL <span class="text-danger">*</span></label>
+                    <input type="url" id="f-watchUrl" class="form-control" placeholder="https://youtu.be/XXXXXXXXXXX">
+                    <div class="form-text">The short link shown on the Watch Now button</div>
+                </div>
+                <div class="col-12">
+                    <label class="form-label" for="f-title">Card Title <span class="text-danger">*</span></label>
+                    <input type="text" id="f-title" class="form-control" placeholder="e.g. Momentum is building in this shipping stock.">
+                </div>
+                <div class="col-12">
+                    <label class="form-label" for="f-youtubeTitle">YouTube Video Title <span class="text-danger">*</span></label>
+                    <input type="text" id="f-youtubeTitle" class="form-control" placeholder="Full title of the YouTube video (used for accessibility)">
+                </div>
+                <div class="col-12">
+                    <label class="form-label" for="f-description">Description <span class="text-danger">*</span></label>
+                    <textarea id="f-description" class="form-control" rows="2" placeholder="Short summary of the stock call..."></textarea>
+                </div>
+                <div class="col-12">
+                    <button class="btn btn-primary" id="add-btn">
+                        <span id="add-spinner" class="spinner-border spinner-border-sm me-2 d-none"></span>
+                        <i class="bi bi-plus-circle me-1"></i>Add Stock Call
+                    </button>
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- EXISTING STOCK CALLS -->
+            <h5 class="mt-4 mb-3 fw-bold">
+                Existing Stock Calls
+                <span id="entry-count" class="badge bg-secondary ms-1">0</span>
+            </h5>
+            <div id="entries-list">
+                <div class="text-center py-4 text-muted">
+                    <div class="spinner-border spinner-border-sm me-2"></div> Loading...
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+const API = 'stock-api.php';
+
+// ── helpers ──────────────────────────────────────────────────────────────────
+function showAlert(el, msg) {
+    el.style.display = 'block';
+    el.textContent   = msg;
+}
+function hideAlert(el) { el.style.display = 'none'; }
+
+function thumbUrl(embedUrl) {
+    const m = embedUrl.match(/\/embed\/([^?&]+)/);
+    return m ? 'https://img.youtube.com/vi/' + m[1] + '/mqdefault.jpg' : '';
+}
+
+function post(action, data) {
+    return fetch(API, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(Object.assign({ action: action }, data))
+    }).then(function (r) { return r.json(); });
+}
+
+// ── check session on load ────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', function () {
+    fetch(API + '?action=check')
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            if (data.loggedIn) showAdmin();
+        });
+});
+
+// ── login ────────────────────────────────────────────────────────────────────
+document.getElementById('login-btn').addEventListener('click', function () {
+    var user  = document.getElementById('login-user').value.trim();
+    var pass  = document.getElementById('login-pass').value.trim();
+    var errEl = document.getElementById('login-error');
+    var spin  = document.getElementById('login-spinner');
+
+    if (!user || !pass) { showAlert(errEl, 'Please enter username and password.'); return; }
+    hideAlert(errEl);
+    spin.classList.remove('d-none');
+
+    post('login', { username: user, password: pass })
+        .then(function (data) {
+            spin.classList.add('d-none');
+            if (data.success) {
+                showAdmin();
+            } else {
+                showAlert(errEl, data.message || 'Login failed.');
+            }
+        })
+        .catch(function () {
+            spin.classList.add('d-none');
+            showAlert(errEl, 'Connection error. Please try again.');
+        });
+});
+
+document.getElementById('login-pass').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') document.getElementById('login-btn').click();
+});
+
+// ── logout ───────────────────────────────────────────────────────────────────
+document.getElementById('logout-btn').addEventListener('click', function () {
+    post('logout', {}).then(function () {
+        document.getElementById('admin-section').style.display = 'none';
+        document.getElementById('login-section').style.display = 'block';
+        document.getElementById('login-user').value = '';
+        document.getElementById('login-pass').value = '';
+    });
+});
+
+// ── show admin panel ─────────────────────────────────────────────────────────
+function showAdmin() {
+    document.getElementById('login-section').style.display = 'none';
+    document.getElementById('admin-section').style.display = 'block';
+    loadEntries();
+}
+
+// ── load entries ─────────────────────────────────────────────────────────────
+function loadEntries() {
+    var list = document.getElementById('entries-list');
+    list.innerHTML = '<div class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm me-2"></div> Loading...</div>';
+
+    fetch(API + '?action=list')
+        .then(function (r) { return r.json(); })
+        .then(function (videos) {
+            document.getElementById('entry-count').textContent = videos.length;
+            if (!videos.length) {
+                list.innerHTML = '<p class="text-muted">No stock calls yet. Add one above.</p>';
+                return;
+            }
+            list.innerHTML = videos.map(function (v) {
+                var thumb = thumbUrl(v.embedUrl);
+                return '<div class="entry-row" id="entry-' + v.id + '">' +
+                    (thumb ? '<div class="entry-thumb"><img src="' + thumb + '" alt="thumbnail" loading="lazy"></div>' : '') +
+                    '<div class="entry-meta">' +
+                        '<strong title="' + v.title + '">' + v.title + '</strong>' +
+                        '<small>' + v.description + '</small><br>' +
+                        '<small class="text-primary">' + v.embedUrl + '</small>' +
+                    '</div>' +
+                    '<button class="btn btn-sm btn-outline-danger btn-del" onclick="deleteEntry(\'' + v.id + '\')">' +
+                        '<i class="bi bi-trash"></i>' +
+                    '</button>' +
+                '</div>';
+            }).join('');
+        })
+        .catch(function () {
+            list.innerHTML = '<p class="text-danger">Failed to load entries.</p>';
+        });
+}
+
+// ── add entry ────────────────────────────────────────────────────────────────
+document.getElementById('add-btn').addEventListener('click', function () {
+    var errEl  = document.getElementById('add-error');
+    var succEl = document.getElementById('add-success');
+    var spin   = document.getElementById('add-spinner');
+    hideAlert(errEl);
+    hideAlert(succEl);
+
+    var data = {
+        embedUrl:     document.getElementById('f-embedUrl').value.trim(),
+        watchUrl:     document.getElementById('f-watchUrl').value.trim(),
+        title:        document.getElementById('f-title').value.trim(),
+        youtubeTitle: document.getElementById('f-youtubeTitle').value.trim(),
+        description:  document.getElementById('f-description').value.trim()
+    };
+
+    var allFilled = Object.keys(data).every(function (k) { return !!data[k]; });
+    if (!allFilled) { showAlert(errEl, 'All fields are required.'); return; }
+
+    spin.classList.remove('d-none');
+    document.getElementById('add-btn').disabled = true;
+
+    post('add', data)
+        .then(function (res) {
+            spin.classList.add('d-none');
+            document.getElementById('add-btn').disabled = false;
+            if (res.success) {
+                showAlert(succEl, 'Stock call added successfully! It now appears first on the public page.');
+                ['f-embedUrl','f-watchUrl','f-title','f-youtubeTitle','f-description'].forEach(function (id) {
+                    document.getElementById(id).value = '';
+                });
+                loadEntries();
+            } else {
+                showAlert(errEl, res.message || 'Failed to add entry.');
+            }
+        })
+        .catch(function () {
+            spin.classList.add('d-none');
+            document.getElementById('add-btn').disabled = false;
+            showAlert(errEl, 'Connection error. Please try again.');
+        });
+});
+
+// ── delete entry ─────────────────────────────────────────────────────────────
+function deleteEntry(id) {
+    if (!confirm('Delete this stock call? This cannot be undone.')) return;
+    post('delete', { id: id })
+        .then(function (res) {
+            if (res.success) {
+                loadEntries();
+            } else {
+                alert('Failed to delete: ' + (res.message || 'Unknown error'));
+            }
+        })
+        .catch(function () {
+            alert('Connection error. Please try again.');
+        });
+}
+</script>
+
+<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
